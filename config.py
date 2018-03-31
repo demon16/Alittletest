@@ -1,0 +1,10 @@
+DEBUG = True
+HOST = '0.0.0.0'
+PORT = 5000
+SECRET_KEY = 'Monster is Coming'
+
+
+REDIS_HOST = '0.0.0.0'
+REDIS_PORT = 6379
+REDIS_DB = 6
+
