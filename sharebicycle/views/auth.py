@@ -1,21 +1,22 @@
 # coding:utf-8
-from flask import current_app, request, jsonify, g
+from flask import current_app, request, jsonify, g, make_response
 from sharebicycle.model import User
 from sharebicycle import api
-from sharebicycle.decorator import login_check
+from sharebicycle.decorator import login_check, error_handle
 import hashlib
 import time
 
 
 @api.route('/login', methods=['POST'])
+@error_handle
 def login():
     name = (request.get_json() or {}).get('username')
     password = request.get_json().get('password')
     user = User.query.filter_by(name=name, is_del=0).first()
     if not user:
-        return jsonify({'code': 200, 'msg': 'No this item', 'result': False})
+        return make_response(jsonify({'code': 200, 'msg': 'No this item', 'result': False}))
     if user.password != password:
-        return jsonify({'code': 200, 'msg': 'Password error', 'result': False})
+        return make_response(jsonify({'code': 200, 'msg': 'Password error', 'result': False}))
 
     m = hashlib.md5()
     m.update(name.encode())
@@ -29,10 +30,11 @@ def login():
     pipeline.expire('token:%s' % token, 3600*24)
     pipeline.execute()
 
-    return jsonify({'code': 200, 'msg': 'Login success', 'result': True, 'token': token})
+    return make_response(jsonify({'code': 200, 'msg': 'Login success', 'result': True, 'token': token}))
 
 
 @api.route('/logout')
+@error_handle
 @login_check
 def logout():
     user = g.current_user
@@ -40,4 +42,4 @@ def logout():
     pipeline.delete('token:%s' % g.token)
     pipeline.hmset('user:%s' % user.name, {'app_online': 0})
     pipeline.execute()
-    return jsonify({'code': 200, 'msg': 'Logout success', 'result': True})
+    return make_response(jsonify({'code': 200, 'msg': 'Logout success', 'result': True}))

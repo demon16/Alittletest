@@ -1,11 +1,11 @@
-from flask import jsonify
+from flask import jsonify, make_response
 
 def check_answer(res, msg, data=False):
     if isinstance(res, str):
         "error"
-        return jsonify({'code': 200, 'msg': res, 'result': False})
+        return make_response(jsonify({'code': 200, 'msg': res, 'result': False}))
     else:
         if data:
-            return jsonify({'code': 200, 'msg': msg, 'result': res.to_dict()})
-        return jsonify({'code': 200, 'msg': msg, 'result': True})
+            return make_response(jsonify({'code': 200, 'msg': msg, 'result': res.to_dict()}))
+        return make_response(jsonify({'code': 200, 'msg': msg, 'result': True}))
         

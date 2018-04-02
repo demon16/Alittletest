@@ -1,13 +1,14 @@
 # coding:utf-8
 from flask import request, g, jsonify
 from sharebicycle import api
-from sharebicycle.decorator import login_check, admin_privilege, operate_limit
+from sharebicycle.decorator import login_check, admin_privilege, operate_limit, error_handle
 from sharebicycle.model import User
 from sharebicycle.public import db_session
 from sharebicycle.utils import check_answer
 
 
 @api.route('/user/add', methods=['POST'])
+@error_handle
 def add_user():
     params = request.get_json()
     name = params.get('username')
@@ -24,6 +25,7 @@ def add_user():
     return check_answer(res, 'ojbk', True)
 
 @api.route('/user/delete', methods=['POST'])
+@error_handle
 @admin_privilege
 def del_user():
     user_id = request.get_json().get('userId')
@@ -34,6 +36,7 @@ def del_user():
     return check_answer(res, 'Delete success')
 
 @api.route('/user/modify', methods=['POST'])
+@error_handle
 @operate_limit
 def modify_user():
     params = request.get_json()
@@ -45,6 +48,7 @@ def modify_user():
     return check_answer(res, 'Modify success')
 
 @api.route('/user/getInfo', methods=['POST'])
+@error_handle
 @operate_limit
 def get_user():
     user_id = request.get_json().get('userId')
@@ -54,6 +58,7 @@ def get_user():
     return jsonify({'code': 200, 'msg': 'Get success', 'result': user.to_dict()})
 
 @api.route('/user/setBlacklist', methods=['POST'])
+@error_handle
 @admin_privilege
 def add_blacklist():
     user_id = request.get_json().get('userId')
@@ -67,6 +72,7 @@ def add_blacklist():
     return check_answer(res, 'Get in blacklist')
 
 @api.route('/user/release', methods=['POST'])
+@error_handle
 @admin_privilege
 def release_user():
     user_id = request.get_json().get('userId')
@@ -80,6 +86,7 @@ def release_user():
     return check_answer(res, 'Get out blacklist')
 
 @api.route('/user/getList', methods=['POST'])
+@error_handle
 @admin_privilege
 def get_users():
     params = request.get_json()
